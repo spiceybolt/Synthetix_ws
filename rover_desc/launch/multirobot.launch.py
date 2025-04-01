@@ -11,6 +11,8 @@ def generate_launch_description():
     package_name = 'rover_desc'
     pkg_share = get_package_share_directory(package_name)
 
+    world_file_path = os.path.join(pkg_share, 'worlds', 'rover_stable.world')
+
     # xacro_file = os.path.join(pkg_share, 'urdf', 'rover.urdf.xacro')
     robot1_xacro_file = os.path.join(pkg_share,'urdf','robot_1.urdf.xacro')
     robot2_xacro_file = os.path.join(pkg_share,'urdf','robot_2.urdf.xacro')
@@ -27,7 +29,10 @@ def generate_launch_description():
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')
-        )
+        ),
+        launch_arguments={
+            'world': world_file_path
+        }.items()
     )
 
     # Group actions under namespace
