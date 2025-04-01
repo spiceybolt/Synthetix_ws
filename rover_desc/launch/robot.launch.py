@@ -16,11 +16,16 @@ def generate_launch_description():
         )
     namespace = LaunchConfiguration('namespace')
 
+    x_position_arg = DeclareLaunchArgument(
+        'x_position', default_value='0.0', description='X position of the robot'
+    )
+    x_position = LaunchConfiguration('x_position')
+
     xacro_file = os.path.join(pkg_share, 'urdf', 'rover.urdf.xacro')
     robot_description_config = xacro.process_file(xacro_file, mappings={'robot_namespace': namespace})
     robot_description = {'robot_description': robot_description_config.toxml()}
 
-    world = os.path.join(pkg_share, "worlds", "setup1")
+    robot_name = LaunchConfiguration('namespace')
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -28,14 +33,12 @@ def generate_launch_description():
         )
     )
 
-    robot_name = LaunchConfiguration('namespace')
-
     # Group actions under namespace
     robot_group = GroupAction([
         Node(
             package='gazebo_ros',
             executable="spawn_entity.py",
-            arguments=['-topic', 'robot_description', '-entity', robot_name, '-x', '0'],
+            arguments=['-topic', 'robot_description', '-entity', robot_name, '-x', x_position],
             parameters=[{'use_sim_time': True}],
             namespace=namespace
         ),
@@ -49,7 +52,8 @@ def generate_launch_description():
         )
     ])
     return LaunchDescription([
-        namespace_arg,
         gazebo,
+        namespace_arg,
+        x_position_arg,
         robot_group
     ])
