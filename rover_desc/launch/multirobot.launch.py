@@ -39,7 +39,7 @@ def generate_launch_description():
     spawn1 = Node(
         package='gazebo_ros',
         executable="spawn_entity.py",
-        arguments=['-topic', 'robot_description', '-entity', 'robot_1', '-x', '5.0'],
+        arguments=['-topic', 'robot_description', '-entity', 'robot_1', '-y', '-36.0'],
         parameters=[{'use_sim_time': True}],
         namespace='robot1'
     )
@@ -47,7 +47,7 @@ def generate_launch_description():
     spawn2 = Node(
         package='gazebo_ros',
         executable="spawn_entity.py",
-        arguments=['-topic', 'robot_description', '-entity', 'robot_2', '-x', '10.0'],
+        arguments=['-topic', 'robot_description', '-entity', 'robot_2', '-y', '-18.0'],
         parameters=[{'use_sim_time': True}],
         namespace='robot2'
     )
@@ -55,7 +55,7 @@ def generate_launch_description():
     spawn3 = Node(
         package='gazebo_ros',
         executable="spawn_entity.py",
-        arguments=['-topic', 'robot_description', '-entity', 'robot_3', '-x', '15.0'],
+        arguments=['-topic', 'robot_description', '-entity', 'robot_3'],
         parameters=[{'use_sim_time': True}],
         namespace='robot3'
     )
@@ -63,7 +63,7 @@ def generate_launch_description():
     spawn4 = Node(
         package='gazebo_ros',
         executable="spawn_entity.py",
-        arguments=['-topic', 'robot_description', '-entity', 'robot_4','-x', '20.0'],
+        arguments=['-topic', 'robot_description', '-entity', 'robot_4','-y', '18.0'],
         parameters=[{'use_sim_time': True}],
         namespace='robot4'
     )
@@ -71,7 +71,7 @@ def generate_launch_description():
     spawn5 = Node(
         package='gazebo_ros',
         executable="spawn_entity.py",
-        arguments=['-topic', 'robot_description', '-entity', 'robot_5', '-x', '25.0'],
+        arguments=['-topic', 'robot_description', '-entity', 'robot_5', '-y', '36.0'],
         parameters=[{'use_sim_time': True}],
         namespace='robot5'
     )
