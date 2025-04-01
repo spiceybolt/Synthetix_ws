@@ -39,8 +39,8 @@
     </gazebo>
 
     <gazebo reference="${robot_namespace}/lb_wheel">
-        <mu1>2.5</mu1>
-        <mu2>2.5</mu2>
+        <mu1>1.8</mu1>
+        <mu2>1.8</mu2>
         <kp>10000000.0</kp>
         <kd>1000.0</kd>
         <minDepth>0.001</minDepth>
@@ -48,8 +48,8 @@
     </gazebo>
 
     <gazebo reference="${robot_namespace}/lf_wheel">
-        <mu1>2.5</mu1>
-        <mu2>2.5</mu2>
+        <mu1>1.8</mu1>
+        <mu2>1.8</mu2>
         <kp>10000000.0</kp>
         <kd>1000.0</kd>
         <minDepth>0.001</minDepth>
@@ -57,8 +57,8 @@
     </gazebo>
 
     <gazebo reference="${robot_namespace}/rb_wheel">
-        <mu1>2.5</mu1>
-        <mu2>2.5</mu2>
+        <mu1>1.8</mu1>
+        <mu2>1.8</mu2>
         <kp>10000000.0</kp>
         <kd>1000.0</kd>
         <minDepth>0.001</minDepth>
@@ -66,8 +66,8 @@
     </gazebo>
 
     <gazebo reference="${robot_namespace}/rf_wheel">
-        <mu1>2.5</mu1>
-        <mu2>2.5</mu2>
+        <mu1>1.8</mu1>
+        <mu2>1.8</mu2>
         <kp>10000000.0</kp>
         <kd>1000.0</kd>
         <minDepth>0.001</minDepth>

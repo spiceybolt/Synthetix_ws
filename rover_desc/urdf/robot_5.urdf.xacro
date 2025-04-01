@@ -38,26 +38,26 @@
 
         </plugin>
     </gazebo>
-
+<!-- 
     <gazebo reference="lb_wheel">
-        <mu1>0.5</mu1>
-        <mu2>0.5</mu2>
+        <mu1>1.8</mu1>
+        <mu2>1.8</mu2>
     </gazebo>
 
     <gazebo reference="lf_wheel">
-        <mu1>0.5</mu1>
-        <mu2>0.5</mu2>
+        <mu1>1.8</mu1>
+        <mu2>1.8</mu2>
     </gazebo>
 
     <gazebo reference="rb_wheel">
-        <mu1>0.5</mu1>
-        <mu2>0.5</mu2>
+        <mu1>1.8</mu1>
+        <mu2>1.8</mu2>
     </gazebo>
 
     <gazebo reference="rf_wheel">
-        <mu1>0.5</mu1>
-        <mu2>0.5</mu2>
-    </gazebo>
+        <mu1>1.8</mu1>
+        <mu2>1.8</mu2>
+    </gazebo> -->
 
     <material name="white">
         <color rgba="1 1 1 1" />
