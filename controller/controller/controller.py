@@ -158,7 +158,6 @@ class MultiRobotVelocityPublisher(Node):
             elif self.robot_states[i] == '5' and abs(x - self.target_x[i])<1.5:
                 self.error[i] = 0
                 self.prev[i] = 0
-
                 self.robot_states[i] = '6'
                 self.speed[i] = 0.0
                 self.target_yaw[i] = math.pi/2
