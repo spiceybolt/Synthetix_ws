@@ -11,7 +11,7 @@ def generate_launch_description():
     package_name = 'rover_desc'
     pkg_share = get_package_share_directory(package_name)
 
-    world_file_path = os.path.join(pkg_share, 'worlds', 'rover_stable.world')
+    world_file_path = os.path.join(pkg_share, 'worlds', 'latest.world')
 
     # xacro_file = os.path.join(pkg_share, 'urdf', 'rover.urdf.xacro')
     robot1_xacro_file = os.path.join(pkg_share,'urdf','robot_1.urdf.xacro')

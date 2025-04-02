@@ -62,10 +62,10 @@
             </plane>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
+            <ambient>0.0 0.8 0.0 1.0</ambient>
+            <diffuse>0.0 0.8 0.0 1.0</diffuse>
+            <specular>0.1 0.1 0.1 1.0</specular>
+            <emissive>0 0 0 0</emissive>
           </material>
         </visual>
       </link>
