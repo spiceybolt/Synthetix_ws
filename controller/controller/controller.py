@@ -30,37 +30,48 @@ class MultiRobotVelocityPublisher(Node):
         self.r4_yaw = 0.0
         self.r5_yaw = 0.0
 
-        self.r1_target_yaw = 0.0
-        self.r2_target_yaw = 0.0
-        self.r3_target_yaw = 0.0
-        self.r4_target_yaw = 0.0
-        self.r5_target_yaw = 0.0
+        self.yaw = [0.0]*5
 
-        self.r1_error = 0.0
-        self.r2_error = 0.0
-        self.r3_error = 0.0
-        self.r4_error = 0.0
-        self.r5_error = 0.0
+        self.robot_poses = [[0.0,0.0] for i in range(5)]
+        self.robot_states = ["1"]*5 #state 1
 
-        self.r1_prev = 0.0
-        self.r2_prev = 0.0
-        self.r3_prev = 0.0
-        self.r4_prev = 0.0
-        self.r5_prev = 0.0
+        self.target_x = [20.0]*5
+        self.target_y = [-36.0,-18.0,0.0,18.0,36.0]
 
-        self.r1_speed = 0.4
-        self.r2_speed = 0.4
-        self.r3_speed = 0.4
-        self.r4_speed = 0.4
-        self.r5_speed = 0.4
+        # self.r1_target_yaw = 0.0
+        # self.r2_target_yaw = 0.0
+        # self.r3_target_yaw = 0.0
+        # self.r4_target_yaw = 0.0
+        # self.r5_target_yaw = 0.0
 
-        self.Kp = 23.0
+        self.target_yaw = [0.0]*5
+
+        # self.r1_error = 0.0
+        # self.r2_error = 0.0
+        # self.r3_error = 0.0
+        # self.r4_error = 0.0
+        # self.r5_error = 0.0
+
+        self.error = [0.0]*5
+
+        self.prev = [0.0]*5
+
+        # self.r1_prev = 0.0
+        # self.r2_prev = 0.0
+        # self.r3_prev = 0.0
+        # self.r4_prev = 0.0
+        # self.r5_prev = 0.0
+
+        self.speed = [0.4]*5
+
+        self.Kp = 18.0
         self.Ki = 0.5
         self.Kd = 1.0
 
+        self.timer = self.create_timer(0.1, self.fsm_update)
         self.timer = self.create_timer(0.1, self.publish_cmd_vel)
 
-    def yaw(self, msg):
+    def yaw_calc(self, msg):
         x = msg.pose.pose.orientation.x
         y = msg.pose.pose.orientation.y 
         z = msg.pose.pose.orientation.z 
@@ -71,131 +82,148 @@ class MultiRobotVelocityPublisher(Node):
         return yaw
 
     def publish_cmd_vel(self):
-        r1_twist = Twist()
-        r2_twist = Twist()
-        r3_twist = Twist()
-        r4_twist = Twist()
-        r5_twist = Twist()
+        twists = [Twist() for _ in range(5)]
+        publishers = [self.r1_vel_pub, self.r2_vel_pub, self.r3_vel_pub, self.r4_vel_pub, self.r5_vel_pub]
         
-        linear_speed = 0.4  
-        r1_twist.linear.x = self.r1_speed
-        r2_twist.linear.x = self.r2_speed
-        r3_twist.linear.x = self.r3_speed
-        r4_twist.linear.x = self.r4_speed
-        r5_twist.linear.x = self.r5_speed
+        # Initialize error_sum array if it doesn't exist
+        if not hasattr(self, 'error_sum'):
+            self.error_sum = [0.0] * 5
         
-        r1_p_term = self.Kp * self.r1_error
-        
-        if not hasattr(self, 'r1_error_sum'):
-            self.r1_error_sum = 0.0
-        self.r1_error_sum += self.r1_error * 0.1  # 0.1 is the timer period
-        r1_i_term = self.Ki * self.r1_error_sum
-        
-        r1_error_change = self.r1_error - self.r1_prev
-        r1_d_term = self.Kd * r1_error_change / 0.1  # 0.1 is the timer period
-        
-        r1_angular_correction = r1_p_term + r1_i_term + r1_d_term
-        r1_twist.angular.z = r1_angular_correction
-        
-        r2_p_term = self.Kp * self.r2_error
-        
-        if not hasattr(self, 'r2_error_sum'):
-            self.r2_error_sum = 0.0
-        self.r2_error_sum += self.r2_error * 0.1
-        r2_i_term = self.Ki * self.r2_error_sum
-        
-        r2_error_change = self.r2_error - self.r2_prev
-        r2_d_term = self.Kd * r2_error_change / 0.1
-        
-        r2_angular_correction = r2_p_term + r2_i_term + r2_d_term
-        r2_twist.angular.z = r2_angular_correction
-        
-        r3_p_term = self.Kp * self.r3_error
-        
-        if not hasattr(self, 'r3_error_sum'):
-            self.r3_error_sum = 0.0
-        self.r3_error_sum += self.r3_error * 0.1
-        r3_i_term = self.Ki * self.r3_error_sum
-        
-        r3_error_change = self.r3_error - self.r3_prev
-        r3_d_term = self.Kd * r3_error_change / 0.1
-        
-        r3_angular_correction = r3_p_term + r3_i_term + r3_d_term
-        r3_twist.angular.z = r3_angular_correction
-        
-        r4_p_term = self.Kp * self.r4_error
-        
-        if not hasattr(self, 'r4_error_sum'):
-            self.r4_error_sum = 0.0
-        self.r4_error_sum += self.r4_error * 0.1
-        r4_i_term = self.Ki * self.r4_error_sum
-        
-        r4_error_change = self.r4_error - self.r4_prev
-        r4_d_term = self.Kd * r4_error_change / 0.1
-        
-        r4_angular_correction = r4_p_term + r4_i_term + r4_d_term
-        r4_twist.angular.z = r4_angular_correction
-        
-        r5_p_term = self.Kp * self.r5_error
-        
-        if not hasattr(self, 'r5_error_sum'):
-            self.r5_error_sum = 0.0
-        self.r5_error_sum += self.r5_error * 0.1
-        r5_i_term = self.Ki * self.r5_error_sum
-        
-        r5_error_change = self.r5_error - self.r5_prev
-        r5_d_term = self.Kd * r5_error_change / 0.1
-        
-        r5_angular_correction = r5_p_term + r5_i_term + r5_d_term
-        r5_twist.angular.z = r5_angular_correction
-        
-        self.get_logger().info(f"R1 correction: {r1_angular_correction}, error: {self.r1_error}")
-        self.get_logger().info(f"R2 correction: {r2_angular_correction}, error: {self.r2_error}")
-        self.get_logger().info(f"R3 correction: {r2_angular_correction}, error: {self.r3_error}")
-        self.get_logger().info(f"R4 correction: {r2_angular_correction}, error: {self.r4_error}")
-        self.get_logger().info(f"R5 correction: {r2_angular_correction}, error: {self.r5_error}")
-        
-        self.r1_vel_pub.publish(r1_twist)
-        self.r2_vel_pub.publish(r2_twist)
-        self.r3_vel_pub.publish(r3_twist)
-        self.r4_vel_pub.publish(r4_twist)
-        self.r5_vel_pub.publish(r5_twist)
+        for i in range(5):
+            if self.error[i] < -1.0:
+                self.error[i] = 1.0
+            elif self.error[i] > 1.0:
+                self.error[i] = 1.0
+
+        for i in range(5):
+            # Set linear speed
+            twists[i].linear.x = self.speed[i]
+            
+            # Calculate PID terms
+            p_term = self.Kp * self.error[i]
+            
+            self.error_sum[i] += self.error[i] * 0.1  # 0.1 is the timer period
+            i_term = self.Ki * self.error_sum[i]
+            
+            error_change = self.error[i] - self.prev[i]
+            d_term = self.Kd * error_change / 0.1  # 0.1 is the timer period
+            
+
+            angular_correction = p_term + i_term + d_term
+            if angular_correction > 2.0:
+                angular_correction = 2.0
+            elif angular_correction < -2.0:
+                angular_correction = -2.0
+
+            twists[i].angular.z = angular_correction
+            
+            # self.get_logger().info(f"Robot {i+1} correction: {angular_correction}, error: {self.error[i]}")
+
+            # publishers[i].publish(twists[i])
+            self.r1_vel_pub.publish(twists[0])
+            self.r2_vel_pub.publish(twists[1])
+            self.r3_vel_pub.publish(twists[2])
+            self.r4_vel_pub.publish(twists[3])
+            self.r5_vel_pub.publish(twists[4])
 
     #P term is error
     #I term is sum of error
     #D term is diff of error
+    def fsm_update(self):
 
+        for i in range(5):
+            x = self.robot_poses[i][0]
+            y = self.robot_poses[i][1]
+            if self.robot_states[i] == '1' and abs(x - self.target_x[i])<0.5:
+                self.robot_states[i] = '2'
+                self.speed[i] = 0.0
+                self.target_yaw[i] = - math.pi/2
+                self.error_sum[i] = 0.0
+                # self.target_y = y + 15.0
+            elif self.robot_states[i] == '2' and abs(self.error[i]) < 0.5:
+                self.robot_states[i] = '3'
+                self.speed[i] = 0.4
+                self.target_y[i] = y - 15.0
+                self.error_sum[i] = 0.0
+            elif self.robot_states[i] == '3' and abs(y - self.target_y[i])<0.5:
+                self.robot_states[i] = '4'
+                self.speed[i] = 0.0
+                self.target_yaw[i] = math.pi
+                self.error_sum[i] = 0.0
+            elif self.robot_states[i] == '4' and abs(self.error[i]) < 0.4:
+                self.robot_states[i] = '5'
+                self.speed[i] = 0.4
+                self.target_x[i] = x - 20.0
+                self.error_sum[i] = 0.0
+            elif self.robot_states[i] == '5' and abs(x - self.target_x[i])<1.5:
+                self.error[i] = 0
+                self.prev[i] = 0
+
+                self.robot_states[i] = '6'
+                self.speed[i] = 0.0
+                self.target_yaw[i] = math.pi/2
+                self.error_sum[i] = 0.0
+            elif self.robot_states[i] == '6' and abs(self.error[i])<0.5:
+                self.robot_states[i] = '7'
+                self.speed[i] = 0.4
+                self.target_y[i] = y + 15.0
+                self.error_sum[i] = 0.0
+            elif self.robot_states[i] == '7' and abs(y - self.target_y[i])<0.5:
+                self.robot_states[i] = '8'
+                self.speed[i] = 0.0
+                self.target_yaw[i] = 0.0
+                self.error_sum[i] = 0.0
+            elif self.robot_states[i] == '8' and abs(self.error[i])<0.5:
+                self.robot_states[i] = '1'
+                self.speed[i] = 0.4
+                self.target_x[i] = x + 20.0 
+                self.error_sum[i] = 0.0
+
+            if self.robot_states[i] == '5':
+                self.get_logger().info(f"{abs(x-self.target_x[i])}")
 
     def r1_odom_callback(self, msg):
-        self.r1_yaw = self.yaw(msg)
+        self.yaw[0] = self.yaw_calc(msg)
+        self.robot_poses[0][0] = msg.pose.pose.position.x
+        self.robot_poses[0][1] = msg.pose.pose.position.y
         # self.get_logger().info(f"r1 yaw = {self.r1_yaw}")
-        self.r1_prev = self.r1_error
-        self.r1_error = self.r1_target_yaw - self.r1_yaw
+        self.prev[0] = self.error[0]
+        self.error[0] = self.target_yaw[0] - self.yaw[0]
+        # self.r1_prev = self.r1_error
+        # self.r1_error = self.r1_target_yaw - self.r1_yaw
 
 
     def r2_odom_callback(self, msg):
-        self.r2_yaw = self.yaw(msg)
+        self.yaw[1] = self.yaw_calc(msg)
+        self.robot_poses[1][0] = msg.pose.pose.position.x
+        self.robot_poses[1][1] = msg.pose.pose.position.y
         # self.get_logger().info(f"r2 yaw = {self.r2_yaw}")
-        self.r2_prev = self.r2_error
-        self.r2_error = self.r2_target_yaw - self.r2_yaw
+        self.prev[1] = self.error[1]
+        self.error[1] = self.target_yaw[1] - self.yaw[1]
 
     def r3_odom_callback(self, msg):
-        self.r3_yaw = self.yaw(msg)
-        # self.get_logger().info(f"r3 yaw = {self.r3_yaw}")
-        self.r3_prev = self.r3_error
-        self.r3_error = self.r1_target_yaw - self.r3_yaw
+        self.yaw[2] = self.yaw_calc(msg)
+        self.robot_poses[2][0] = msg.pose.pose.position.x
+        self.robot_poses[2][1] = msg.pose.pose.position.y
+        # self.get_logger().info(f"r2 yaw = {self.r2_yaw}")
+        self.prev[2] = self.error[2]
+        self.error[2] = self.target_yaw[2] - self.yaw[2]
 
     def r4_odom_callback(self, msg):
-        self.r4_yaw = self.yaw(msg)
-        # self.get_logger().info(f"r4 yaw = {self.r4_yaw}")
-        self.r4_prev = self.r4_error
-        self.r4_error = self.r4_target_yaw - self.r4_yaw
+        self.yaw[3] = self.yaw_calc(msg)
+        self.robot_poses[3][0] = msg.pose.pose.position.x
+        self.robot_poses[3][1] = msg.pose.pose.position.y
+        # self.get_logger().info(f"r2 yaw = {self.r2_yaw}")
+        self.prev[3] = self.error[3]
+        self.error[3] = self.target_yaw[3] - self.yaw[3]
 
     def r5_odom_callback(self, msg):
-        self.r5_yaw = self.yaw(msg)
-        # self.get_logger().info(f"r5 yaw = {self.r5_yaw}")
-        self.r5_prev = self.r5_error
-        self.r5_error = self.r5_target_yaw - self.r5_yaw
+        self.yaw[4] = self.yaw_calc(msg)
+        self.robot_poses[4][0] = msg.pose.pose.position.x
+        self.robot_poses[4][1] = msg.pose.pose.position.y
+        # self.get_logger().info(f"r2 yaw = {self.r2_yaw}")
+        self.prev[4] = self.error[4]
+        self.error[4] = self.target_yaw[4] - self.yaw[4]
 
 
 def main(args=None):
